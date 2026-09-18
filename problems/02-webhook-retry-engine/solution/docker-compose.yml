@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: webhook
+      POSTGRES_PASSWORD: webhook
+      POSTGRES_DB: webhook_retry
+    ports:
+      - "5432:5432"
+    volumes:
+      - webhook_pg_data:/var/lib/postgresql/data
+
+volumes:
+  webhook_pg_data:
