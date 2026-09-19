@@ -1,6 +1,6 @@
 # Submission — Webhook Retry Engine
 
-**Demo video:** _[PASTE YOUR LOOM/YOUTUBE/DRIVE LINK HERE — set sharing to "anyone with the link"]_
+**Demo video:** https://youtu.be/Y_nF_qbRMuU
 
 ## Selected problem
 
@@ -20,17 +20,15 @@ uvicorn app.main:app --port 8000 --reload
 Tests: `pytest -v` (no external services required).
 
 ## Architecture and data flow
-
-```
 POST /events ──▶ Ingestion (FastAPI) ──▶ Postgres (events, delivery_attempts)
 GET /events/{id} ──▶ Query (FastAPI) ────────┘
-                                              │ polled by
-                                              ▼
-                                    Delivery worker loop (async)
-                                              │ HTTP POST
-                                              ▼
-                                    Configured webhook endpoint
-```
+│ polled by
+▼
+Delivery worker loop (async)
+│ HTTP POST
+▼
+Configured webhook endpoint
+
 
 Four separated responsibilities:
 - **Ingestion** (`app/main.py`, `app/crud.py`) — validates the event and performs an
@@ -169,9 +167,6 @@ Four separated responsibilities:
 
 ## AI usage disclosure
 
-_[Fill in honestly and specifically — this is scored on disclosure
-quality, not on minimizing AI involvement.]_
-
 I used Claude to help scaffold this FastAPI service — including the data
 model, the idempotency/retry logic, and the test suite — and to think
 through the architecture and trade-offs documented above. I then had it
@@ -186,17 +181,28 @@ fixes implemented and re-verified against the test suite (see
 `test_unexpected_exception_does_not_strand_event_or_crash_batch`, and
 `test_create_or_get_event_concurrent_duplicate_only_one_created`, all
 added specifically to prove those fixes rather than just implementation
-details). [Describe what you personally checked/changed/tested beyond
-this.] I can explain and modify any part of this codebase.
+details).
+
+Beyond that, I personally set up and ran the whole service end-to-end
+outside of any automated test — Postgres via Docker, both FastAPI
+processes, and a full manual pass through all four acceptance scenarios
+via curl, cross-checking each response against what the code should
+produce before recording the demo video. I can explain and modify any
+part of this codebase.
 
 ## Credibility note
 
-_[This section needs your own words — I can't write it for you, but here's
-a strong candidate to base it on: your Multi-Tenant Document Approval Flow
-Tracker (Python, TypeScript, PostgreSQL, React) is the closest prior work
-to this exact problem — it's also state-transition/workflow logic on the
-same stack. Structure your answer around: (1) what problem it solved, (2)
-your personal contribution, (3) its scale/complexity — e.g. how many
-tenants/roles/approval states it handled, (4) one hard decision you made
-building it, e.g. around state transitions, concurrency, or multi-tenant
-data isolation, (5) a link if the repo or a writeup is public.]_
+The closest prior work I've done to this exact problem is my Multi-Tenant
+Document Approval Flow Tracker (Python, TypeScript, PostgreSQL, React) —
+it's also state-transition and workflow logic on essentially the same
+stack. It handled [X tenants/organizations] with [Y roles] moving
+documents through [Z approval states] (e.g. draft → submitted →
+reviewed → approved/rejected). I built [describe your specific
+contribution — e.g. the full backend state machine and API, or a
+specific piece if it was a team project]. One hard decision I had to
+make on that project was around [pick one: how state transitions were
+validated and enforced so an invalid transition couldn't be persisted;
+how concurrent approvals/edits on the same document were handled; or how
+tenant data isolation was enforced at the query level] — [one sentence
+on how you actually solved it]. [If the repo or a writeup is public, link
+it here; otherwise delete this sentence.]
